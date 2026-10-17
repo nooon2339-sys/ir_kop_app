@@ -26,13 +26,21 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Generate Android Folder automatically
+    - name: Generate Android Folder
       run: flutter create . --platforms=android
-
-    - name: Fix Gradle Properties for newDsl
+      
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Install NDK
+      run: echo "y" | sdkmanager "ndk;25.1.8937393"
+      
+    - name: Fix Gradle and NDK Config
       run: |
+        sed -i 's/ndkVersion = flutter.ndkVersion/ndkVersion = "25.1.8937393"/g' android/app/build.gradle.kts
         echo "android.newDsl=false" >> android/gradle.properties
         echo "android.builtInKotlin=false" >> android/gradle.properties
+        sed -i 's/distributionUrl=.*/distributionUrl=https\\:\/\/services.gradle.org\/distributions\/gradle-8.4-all.zip/' android/gradle/wrapper/gradle-wrapper.properties
       
     - name: Build APK
       run: flutter build apk --release
