@@ -29,18 +29,17 @@ jobs:
     - name: Generate Android Folder
       run: flutter create . --platforms=android
       
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      
-    - name: Install NDK
-      run: echo "y" | sdkmanager "ndk;25.1.8937393"
-      
-    - name: Fix Gradle and NDK Config
+    - name: Setup NDK and Gradle Fixes
       run: |
+        # قبول کردن مجوزهای اندروید
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+        # نصب NDK مورد نیاز
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393"
+        # تغییر نسخه NDK در پروژه
         sed -i 's/ndkVersion = flutter.ndkVersion/ndkVersion = "25.1.8937393"/g' android/app/build.gradle.kts
+        # رفع ارورهای Gradle
         echo "android.newDsl=false" >> android/gradle.properties
         echo "android.builtInKotlin=false" >> android/gradle.properties
-        sed -i 's/distributionUrl=.*/distributionUrl=https\\:\/\/services.gradle.org\/distributions\/gradle-8.4-all.zip/' android/gradle/wrapper/gradle-wrapper.properties
       
     - name: Build APK
       run: flutter build apk --release
