@@ -28,9 +28,6 @@ jobs:
 
     - name: Generate Android Folder automatically
       run: flutter create . --platforms=android
-
-    - name: Generate Launcher Icons
-      run: dart run flutter_launcher_icons
       
     - name: Build APK
       run: flutter build apk --release
